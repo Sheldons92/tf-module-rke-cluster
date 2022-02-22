@@ -31,7 +31,8 @@ variable "rke" {
   default = {
     cluster_name = "rancher-server"
     dind = false
-    kubernetes_version = "" 
+    kubernetes_version = ""
+    cloud_provider = "" 
   }
   description = "RKE configuration"
 }
@@ -79,9 +80,9 @@ Add the following to your tf file:
 
 ```
 module "rke-cluster" {
-  source = "github.com/rawmind0/tf-module-rke-cluster"
+  source = "github.com/sheldons92/tf-module-rke-cluster"
 
-  rancher_nodes = module.rancher_infra.aws_nodes
+  rancher_nodes = module.rke_infra.rke_nodes
 
   rke = {
     cluster_name = local.name
@@ -90,3 +91,16 @@ module "rke-cluster" {
 }
 ```
 
+Add the following to your root providers tf file:
+
+```
+terraform {
+  required_providers {
+    rke = {
+      source  = "rancher/rke"
+      version = "1.3.0"
+    }
+  }
+  required_version = ">= 0.13"
+}
+```

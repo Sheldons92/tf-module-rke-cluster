@@ -15,11 +15,13 @@ variable "rke" {
     cluster_name = string
     dind = bool
     kubernetes_version = string
+    cloud_provider = string
   })
   default = {
     cluster_name = "rancher-server"
     dind = false
     kubernetes_version = ""
+    cloud_provider = ""
   }
   description = "RKE configuration"
 }

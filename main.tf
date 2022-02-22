@@ -1,18 +1,19 @@
-# Provision RKE cluster on provided infrastructure
-resource "rke_cluster" "rancher_cluster" {
+resource rke_cluster "cluster" {
+  ssh_agent_auth     = true
   cluster_name = var.rke.cluster_name
   dind = var.rke.dind
-
+    
   dynamic nodes {
     for_each = var.rke_nodes
     content {
-      address           = nodes.value.public_ip
-      internal_address  = nodes.value.private_ip
-      hostname_override = nodes.value.hostname
-      user              = nodes.value.user
-      role              = nodes.value.roles
-      ssh_key           = nodes.value.ssh_key
+      user = nodes.value.user
+      address = nodes.value.public_ip
+      internal_address = nodes.value.private_ip
+      role    = nodes.value.roles
     }
+  }
+  cloud_provider {
+    name = var.rke.cloud_provider
   }
   upgrade_strategy {
     drain                        = false
@@ -21,6 +22,9 @@ resource "rke_cluster" "rancher_cluster" {
   }
 
   kubernetes_version = var.rke.kubernetes_version
-}
+ }   
 
-  
+  resource "local_file" "kube_cluster_yaml" {
+    filename = "${path.root}/kube_config_cluster.yml"
+    content  = rke_cluster.cluster.kube_config_yaml
+}
